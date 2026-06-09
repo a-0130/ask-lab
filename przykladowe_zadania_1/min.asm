@@ -6,6 +6,7 @@ b equ 3
 
 call getaddr
 format db "min = %d", 0xA, 0
+
 getaddr:
 pop esi
 
@@ -13,7 +14,7 @@ mov eax, a
 mov ecx, b
 
 cmp eax, ecx
-jle dalej
+jle dalej       ; jesli a <= b, to minimum jest w eax
 mov eax, ecx
 
 dalej:
