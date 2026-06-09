@@ -1,0 +1,233 @@
+Zad. 2.2 *
+
+/*
+Polecenie:
+W programie data umiesc w sekcji danych kolejno zmienne a, b, c, d, e, f, g, h typu int oraz odczytaj adresy tych zmiennych.
+Do zmiennych zainicjowanych podstaw kolejne liczby naturalne od 1 do 4.
+Przypadki:
+- a i b sa zainicjowane
+- c i d sa niezainicjowane
+- e jest zainicjowana, f jest niezainicjowana
+- g jest niezainicjowana, h jest zainicjowana
+Skopiuj schemat do komentarza i wypelnij go odpowiednimi wartosciami.
+Czy adresy zmiennych sa zgodne z mapa pamieci dla procesu?
+*/
+
+/* data.c */
+#include <stdio.h>
+
+int a = 1;
+int b = 2;
+int c;
+int d;
+int e = 3;
+int f;
+int g;
+int h = 4;
+
+int main(void) {
+    printf("Adresy i wartosci zmiennych:\n\n");
+
+    printf("&a = %p, a = %d\n", (void*)&a, a);
+    printf("&b = %p, b = %d\n", (void*)&b, b);
+    printf("&c = %p, c = %d\n", (void*)&c, c);
+    printf("&d = %p, d = %d\n", (void*)&d, d);
+    printf("&e = %p, e = %d\n", (void*)&e, e);
+    printf("&f = %p, f = %d\n", (void*)&f, f);
+    printf("&g = %p, g = %d\n", (void*)&g, g);
+    printf("&h = %p, h = %d\n", (void*)&h, h);
+
+    printf("\nSchemat do wypelnienia po uruchomieniu programu:\n");
+    printf("&a [ ][ ][ ][ ] a = %d\n", a);
+    printf("&b [ ][ ][ ][ ] b = %d\n", b);
+    printf("&c [ ][ ][ ][ ] c = %d\n", c);
+    printf("&d [ ][ ][ ][ ] d = %d\n", d);
+    printf("&e [ ][ ][ ][ ] e = %d\n", e);
+    printf("&f [ ][ ][ ][ ] f = %d\n", f);
+    printf("&g [ ][ ][ ][ ] g = %d\n", g);
+    printf("&h [ ][ ][ ][ ] h = %d\n", h);
+
+    return 0;
+}
+
+/*
+Odpowiedz:
+- a, b, e, h sa zmiennymi globalnymi zainicjowanymi, wiec trafiaja do obszaru danych zainicjowanych, czyli .data.
+- c, d, f, g sa zmiennymi globalnymi niezainicjowanymi, wiec trafiaja do obszaru danych niezainicjowanych, czyli .bss.
+- Zmienne globalne nie sa ani na stosie, ani na stercie.
+- Konkretne adresy moga byc inne po kazdym uruchomieniu, bo system moze uzywac ASLR.
+- Adresy sa zgodne z mapa pamieci procesu, jezeli znajduja sie w obszarze danych programu.
+- Nie trzeba oczekiwac, ze wszystkie zmienne beda jedna po drugiej dokladnie w kolejnosci a, b, c, d, e, f, g, h, bo zainicjowane i niezainicjowane zmienne moga trafic do roznych sekcji.
+*/
+
+Zad. 2.4 *
+
+/*
+Polecenie:
+W pliku konwersje.txt dokonaj konwersji liczb:
+- dziesietne 99 na liczbe binarna *
+- szesnastkowe 3A58 na liczbe binarna *
+*/
+
+/* konwersje.txt */
+99(10) = 1100011(2)
+99(10) = 01100011(2)  // zapis na 8 bitach
+
+3A58(16) = 0011 1010 0101 1000(2)
+3A58(16) = 11101001011000(2)  // bez zer wiodacych
+
+/*
+Wyjasnienie:
+99 = 64 + 32 + 2 + 1, wiec bity: 1100011.
+Dla szesnastkowego kazda cyfra daje 4 bity:
+3 = 0011
+A = 1010
+5 = 0101
+8 = 1000
+*/
+
+Zad. 2.5 *
+/*
+Polecenie:
+Napisz program konwersje implementujacy funkcje:
+int bin2dec(int x); // *
+void dec2byte(unsigned int x); // reprezentacja little-endian *
+Odpowiedz tez:
+- jaka maksymalna liczbe binarna mozna zapisac przy pomocy typu int?
+- jaka jest wartosc dziesietna maksymalnej liczby binarnej, jaka mozna zapisac przy pomocy typu int?
+- dla jakich wartosci parametrow aktualnych funkcje dzialaja poprawnie?
+*/
+
+/* konwersje.c */
+#include <stdio.h>
+#include <limits.h>
+
+int dec2bin(int x) {
+    int wynik = 0;
+    int mnoznik = 1;
+
+    if (x == 0) return 0;
+
+    while (x > 0) {
+        wynik += (x % 2) * mnoznik;
+        x /= 2;
+        mnoznik *= 10;
+    }
+
+    return wynik;
+}
+
+int bin2dec(int x) {
+    int wynik = 0;
+    int potega = 1;
+
+    while (x > 0) {
+        int cyfra = x % 10;
+
+        if (cyfra != 0 && cyfra != 1) {
+            return -1; // blad: to nie jest zapis binarny
+        }
+
+        wynik += cyfra * potega;
+        potega *= 2;
+        x /= 10;
+    }
+
+    return wynik;
+}
+
+void dec2byte(unsigned int x) {
+    unsigned char b0 = (x >> 0)  & 0xFF;
+    unsigned char b1 = (x >> 8)  & 0xFF;
+    unsigned char b2 = (x >> 16) & 0xFF;
+    unsigned char b3 = (x >> 24) & 0xFF;
+
+    printf("dec2byte(%u) = [%03u][%03u][%03u][%03u]\n", x, b0, b1, b2, b3);
+}
+
+int main(void) {
+    int x = 1023;
+    int b = 1111111111;
+
+    printf("dec2bin(%d) = %d\n", x, dec2bin(x));
+    printf("bin2dec(%d) = %d\n", b, bin2dec(b));
+    dec2byte(1023);
+
+    return 0;
+}
+
+/*
+Odpowiedzi:
+- Maksymalna liczba binarna zapisana jako int w postaci cyfr 0 i 1 to:
+  1111111111
+  bo 1111111111 miesci sie w int, a 11111111111 jest wieksze od INT_MAX = 2147483647.
+
+- Wartosc dziesietna liczby binarnej 1111111111 to:
+  1023
+
+- dec2bin(int x) dziala poprawnie dla x od 0 do 1023, jezeli wynik ma byc zwracany jako int z cyframi 0 i 1.
+  Dla x = 1024 wynik to 10000000000, a to nie miesci sie w typowym int 32-bitowym.
+
+- bin2dec(int x) dziala poprawnie, gdy x sklada sie tylko z cyfr 0 i 1 oraz miesci sie w int.
+  Najwiekszy sensowny parametr to 1111111111.
+
+- dec2byte(unsigned int x) dziala poprawnie dla kazdej wartosci typu unsigned int.
+  Wypisuje 4 bajty w kolejnosci little-endian, czyli od najmlodszego bajtu do najstarszego.
+*/
+
+Zad. 2.6 *
+/*
+Polecenie:
+Napisz program number wyliczajacy wartosc liczby bez znaku na podstawie jej n-bajtowej reprezentacji pod adresem p.
+Funkcja horner wylicza wartosc wielomianu schematem Hornera:
+int horner(unsigned char *p, int n); // *
+Przetestuj funkcje dla reprezentacji jedno-, dwu- i czterobajtowych.
+Reprezentacje liczby okresl przy pomocy tablicy typu char.
+*/
+
+/* number.c */
+#include <stdio.h>
+
+int horner(unsigned char *p, int n) {
+    int wynik = 0;
+
+    // little-endian: p[0] to najmlodszy bajt, wiec zaczynamy od najstarszego
+    for (int i = n - 1; i >= 0; i--) {
+        wynik = wynik * 256 + p[i];
+    }
+
+    return wynik;
+}
+
+void test(unsigned char *p, int n) {
+    printf("number(%p, %d) = %d\n", (void*)p, n, horner(p, n));
+}
+
+int main(void) {
+    unsigned char one[1]  = {0x7B};                    // 123
+    unsigned char two[2]  = {0x34, 0x12};              // 0x1234 = 4660
+    unsigned char four[4] = {0x00, 0x00, 0xFF, 0x00};  // 0x00FF0000 = 16711680
+
+    test(one, 1);
+    test(two, 2);
+    test(four, 4);
+
+    return 0;
+}
+
+/*
+Wyjasnienie:
+Dla little-endian bajt p[0] jest najmlodszy.
+Wartosc liczby to:
+p[0] + p[1] * 256 + p[2] * 256^2 + p[3] * 256^3 + ...
+
+Schemat Hornera dla little-endian robimy od konca:
+wynik = 0
+wynik = wynik * 256 + p[n-1]
+wynik = wynik * 256 + p[n-2]
+...
+wynik = wynik * 256 + p[0]
+
+Dla four = {0x00, 0x00, 0xFF, 0x00}:
+0x00FF0000 = 16711680
+*/
