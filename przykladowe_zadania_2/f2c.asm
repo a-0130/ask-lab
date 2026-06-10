@@ -1,25 +1,25 @@
 [bits 32]
 
-C equ -5
+F equ 5
 
-mov eax, C
+mov eax, F
 
-mov ecx, 9
-imul ecx
+sub eax, 32
 
 mov ecx, 5
+imul ecx
+
+mov ecx, 9
 cdq
 idiv ecx
 
-add eax, 32
-
 push eax
-push dword C
+push dword F
 
 call getaddr
 format:
-db "C = %d", 0xA
-db "F = %d", 0xA, 0
+db "F = %d", 0xA
+db "C = %d", 0xA, 0
 getaddr:
 
 call [ebx+3*4]

@@ -7,7 +7,7 @@ mov eax, a
 mov edx, b
 
 cmp eax, edx
-jle dalej
+jge dalej
 
 mov eax, edx
 
@@ -17,7 +17,7 @@ push eax
 
 call getaddr
 format:
-db "min = %i", 0xA, 0
+db "max = %i", 0xA, 0
 getaddr:
 
 call [ebx+3*4]
